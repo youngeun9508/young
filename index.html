@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>아이랑 한글 놀이</title>
+    <style>
+        body { margin: 0; font-family: 'Nanum Gothic', sans-serif; background-color: #f0f8ff; overflow: hidden; touch-action: none; }
+        #app { display: flex; flex-direction: column; height: 100vh; }
+        
+        /* 캔버스 영역 */
+        #draw-area { flex: 1; position: relative; background: white; border-bottom: 5px solid #ffcc00; }
+        canvas { width: 100%; height: 100%; touch-action: none; }
+
+        /* 글자 선택창 */
+        #char-bank { height: 35%; background: #fff9c4; display: flex; flex-wrap: wrap; justify-content: center; padding: 10px; overflow-y: auto; gap: 8px; }
+        .char-btn { 
+            width: 50px; height: 50px; background: white; border: 2px solid #ffa000; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold;
+            cursor: pointer; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); user-select: none;
+        }
+
+        /* 컨트롤 메뉴 */
+        #controls { position: absolute; top: 10px; right: 10px; display: flex; gap: 10px; }
+        .btn { padding: 10px 15px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; color: white; }
+        .btn-clear { background: #f44336; }
+        .btn-read { background: #4caf50; }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div id="draw-area">
+        <canvas id="mainCanvas"></canvas>
+        <div id="controls">
+            <button class="btn btn-read" onclick="speakText()">📣 읽어주기</button>
+            <button class="btn btn-clear" onclick="clearCanvas()">♻️ 다시하기</button>
+        </div>
+    </div>
+
+    <div id="char-bank" id="alphabet">
+        <div class="char-btn" onclick="addText('ㄱ')">ㄱ</div>
+        <div class="char-btn" onclick="addText('ㄴ')">ㄴ</div>
+        <div class="char-btn" onclick="addText('ㄷ')">ㄷ</div>
+        <div class="char-btn" onclick="addText('ㄹ')">ㄹ</div>
+        <div class="char-btn" onclick="addText('ㅁ')">ㅁ</div>
+        <div class="char-btn" onclick="addText('ㅂ')">ㅂ</div>
+        <div class="char-btn" onclick="addText('ㅅ')">ㅅ</div>
+        <div class="char-btn" onclick="addText('ㅇ')">ㅇ</div>
+        <div class="char-btn" onclick="addText('ㅈ')">ㅈ</div>
+        <div class="char-btn" onclick="addText('ㅊ')">ㅊ</div>
+        <div class="char-btn" onclick="addText('ㅋ')">ㅋ</div>
+        <div class="char-btn" onclick="addText('ㅌ')">ㅌ</div>
+        <div class="char-btn" onclick="addText('ㅍ')">ㅍ</div>
+        <div class="char-btn" onclick="addText('ㅎ')">ㅎ</div>
+        <div class="char-btn" style="border-color: #2196f3;" onclick="addText('ㅏ')">ㅏ</div>
+        <div class="char-btn" style="border-color: #2196f3;" onclick="addText('ㅑ')">ㅑ</div>
+        <div class="char-btn" style="border-color: #2196f3;" onclick="addText('ㅓ')">ㅓ</div>
+        <div class="char-btn" style="border-color: #2196f3;" onclick="addText('ㅕ')">ㅕ</div>
+        <div class="char-btn" style="border-color: #2196f3;" onclick="addText('ㅗ')">ㅗ</div>
+        <div class="char-btn" style="border-color: #2196f3;" onclick="addText('ㅛ')">ㅛ</div>
+        <div class="char-btn" style="border-color: #2196f3;" onclick="addText('ㅜ')">ㅜ</div>
+        <div class="char-btn" style="border-color: #2196f3;" onclick="addText('ㅠ')">ㅠ</div>
+        <div class="char-btn" style="border-color: #2196f3;" onclick="addText('ㅡ')">ㅡ</div>
+        <div class="char-btn" style="border-color: #2196f3;" onclick="addText('ㅣ')">ㅣ</div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d');
+    let currentText = "";
+
+    // 캔버스 크기 설정
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight * 0.65;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // 그리기 기능
+    let drawing = false;
+    canvas.addEventListener('pointerdown', () => drawing = true);
+    canvas.addEventListener('pointerup', () => { drawing = false; ctx.beginPath(); });
+    canvas.addEventListener('pointermove', draw);
+
+    function draw(e) {
+        if (!drawing) return;
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#333';
+        ctx.lineTo(e.clientX, e.clientY);
+        ctx.stroke();
+    }
+
+    // 글자 추가
+    function addText(char) {
+        currentText += char;
+        ctx.font = "bold 80px Nanum Gothic";
+        ctx.fillStyle = "#FF5722";
+        // 글자를 순차적으로 화면에 그림
+        const xPos = (currentText.length * 70) % (canvas.width - 50);
+        const yPos = 150 + (Math.floor((currentText.length * 70) / canvas.width) * 100);
+        ctx.fillText(char, xPos, yPos);
+    }
+
+    // 초기화
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        currentText = "";
+    }
+
+    // 음성 읽어주기 (TTS)
+    function speakText() {
+        if (!currentText) return;
+        const msg = new SpeechSynthesisUtterance();
+        msg.text = currentText;
+        msg.lang = 'ko-KR';
+        msg.rate = 0.8; // 아이들이 듣기 좋게 약간 천천히
+        window.speechSynthesis.speak(msg);
+    }
+</script>
+
+</body>
+</html>
